@@ -6,24 +6,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stats-info').innerHTML = '❌ 地图库加载失败，请刷新页面或检查网络。';
         return;
     }
-    // 检查地图对象是否存在（由 map.js 创建）
     if (typeof map === 'undefined') {
         console.error('地图对象未初始化，请确保 map.js 正确加载且先于 interaction.js 执行。');
         document.getElementById('stats-info').innerHTML = '❌ 地图初始化失败，请检查控制台。';
         return;
     }
-    // 检查 ECharts 是否加载成功
     if (typeof echarts === 'undefined') {
         console.warn('ECharts 库加载失败，图表将无法显示，请检查网络。');
         document.getElementById('chart-box').innerHTML = '<div style="text-align:center;padding:40px;">⚠️ ECharts 加载失败，请刷新页面或更换网络环境。</div>';
-        return;
     }
 
     // ---------- 创建 marker 图层 ----------
     let markersLayer = L.layerGroup().addTo(map);
     let allMarkers = [];
 
-    // 自定义图标生成函数（使用 div 图标，无需外部图片）
     function getIcon(level, status) {
         const isFu = level.includes("府衙");
         const markerColor = isFu ? "#aa4a2e" : "#528a3e";
@@ -37,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return L.divIcon({ className: 'custom-marker', html: html, iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -36] });
     }
 
-    // 弹窗内容构建
     function buildPopupContent(d) {
         return `
             <div class="custom-popup">
@@ -53,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // 初始化所有 marker
     function initMarkers() {
         markersLayer.clearLayers();
         allMarkers = [];
@@ -67,10 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
             allMarkers.push(marker);
             markersLayer.addLayer(marker);
         });
-        applyFilter(); // 初始筛选
+        applyFilter();
     }
 
-    // 筛选功能
     function applyFilter() {
         const showFu = document.getElementById('filter-fu').checked;
         const showXian = document.getElementById('filter-xian').checked;
@@ -85,10 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         document.getElementById('stats-info').innerHTML = `📌 当前显示 ${visible} 座衙署 | 总计 ${yamenData.length} 座<br>🏛️ 现存 ${yamenData.filter(d => d.status === '现存').length} 处古建筑群`;
-        // 图表数据不随筛选改变，但保持联动
     }
 
-    // 地图定位并打开弹窗
     function flyToYamen(name) {
         const target = yamenData.find(d => d.name === name);
         if (target) {
@@ -100,9 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---------- ECharts 图表 ----------
     let currentChart = null;
-    let currentChartType = 'level'; // level, area, era
+    let currentChartType = 'level';
 
-    // 统计数据函数
     function getLevelStats() {
         const fuCount = yamenData.filter(d => d.level === "府衙").length;
         const xianCount = yamenData.filter(d => d.level === "县衙").length;
@@ -158,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }]
         };
         currentChart.setOption(option, true);
-        // 绑定点击事件
         currentChart.off('click');
         currentChart.on('click', (params) => {
             if (params.componentType === 'series' && params.dataIndex !== undefined) {
@@ -183,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }]
         };
         currentChart.setOption(option, true);
-        currentChart.off('click'); // 年代图表无联动
+        currentChart.off('click');
     }
 
     function renderActiveChart() {
@@ -193,19 +182,15 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (currentChartType === 'era') renderEraChart();
     }
 
-    // 初始化图表
     function initCharts() {
         const chartDom = document.getElementById('chart-box');
         if (chartDom && typeof echarts !== 'undefined') {
             currentChart = echarts.init(chartDom);
             renderActiveChart();
             window.addEventListener('resize', () => currentChart && currentChart.resize());
-        } else {
-            console.error('ECharts 未加载或图表容器不存在');
         }
     }
 
-    // 选项卡切换
     function bindTabs() {
         const btns = document.querySelectorAll('.tab-btn');
         btns.forEach(btn => {
@@ -218,13 +203,149 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 绑定筛选事件
+    // ---------- 对比模式 ----------
+    const compareSelectA = document.getElementById('compareSelectA');
+    const compareSelectB = document.getElementById('compareSelectB');
+    const compareResultDiv = document.getElementById('compareResult');
+    const clearCompareBtn = document.getElementById('clearCompareBtn');
+
+    function populateCompareSelects() {
+        const optionsHtml = yamenData.map(item => `<option value="${item.name}">${item.name} (${item.level})</option>`).join('');
+        compareSelectA.innerHTML = '<option value="">选择衙署 A</option>' + optionsHtml;
+        compareSelectB.innerHTML = '<option value="">选择衙署 B</option>' + optionsHtml;
+    }
+
+    function renderCompare(yamenA, yamenB) {
+        if (!yamenA || !yamenB) {
+            compareResultDiv.innerHTML = '<div class="compare-placeholder">请选择两个衙署进行规制对比</div>';
+            return;
+        }
+        const fields = [
+            { label: '等级', key: 'level' },
+            { label: '始建/重建', key: 'built' },
+            { label: '大堂规制', key: 'hallSpec' },
+            { label: '屋顶形制', key: 'roof' },
+            { label: '占地面积 (㎡)', key: 'area', formatter: (v) => v.toLocaleString() },
+            { label: '保存状态', key: 'status' },
+            { label: '特色描述', key: 'desc' }
+        ];
+        let html = '<table class="compare-table">';
+        html += '<tr><th>规制指标</th><th>' + yamenA.name + '</th><th>' + yamenB.name + '</th></tr>';
+        fields.forEach(field => {
+            let valA = yamenA[field.key];
+            let valB = yamenB[field.key];
+            if (field.formatter) valA = field.formatter(valA);
+            if (field.formatter) valB = field.formatter(valB);
+            html += `<tr>
+                        <th>${field.label}</th>
+                        <td>${valA || '—'}</td>
+                        <td>${valB || '—'}</td>
+                     </tr>`;
+        });
+        html += '</table>';
+        compareResultDiv.innerHTML = html;
+    }
+
+    function onCompareChange() {
+        const nameA = compareSelectA.value;
+        const nameB = compareSelectB.value;
+        if (!nameA || !nameB) {
+            renderCompare(null, null);
+            return;
+        }
+        const yamenA = yamenData.find(d => d.name === nameA);
+        const yamenB = yamenData.find(d => d.name === nameB);
+        renderCompare(yamenA, yamenB);
+    }
+
+    function clearCompare() {
+        compareSelectA.value = '';
+        compareSelectB.value = '';
+        renderCompare(null, null);
+    }
+
+    // ---------- 文献引用弹窗 ----------
+    const modal = document.getElementById('referenceModal');
+    const openBtn = document.getElementById('openRefBtn');
+    const closeSpan = document.querySelector('.close-modal');
+
+    function buildReferenceContent() {
+        const sourcesSet = new Set();
+        yamenData.forEach(item => {
+            if (item.source) {
+                item.source.split(/[；;]/).forEach(s => {
+                    const trimmed = s.trim();
+                    if (trimmed) sourcesSet.add(trimmed);
+                });
+            }
+        });
+        const uniqueSources = Array.from(sourcesSet);
+        let html = `
+            <h3>🏛️ 衙署测绘与文献数据</h3>
+            <div class="source-list">
+                <ul>
+                    ${uniqueSources.map(src => `<li><strong>${src}</strong></li>`).join('')}
+                </ul>
+            </div>
+            <h3>📜 明清官署规制依据</h3>
+            <ul>
+                <li>《明会典》卷一八一·工部·营缮清吏司·公廨</li>
+                <li>《清会典》卷五十八·工部·营缮清吏司·衙署规制</li>
+                <li>刘敦桢《中国古代建筑史》·官署建筑章节</li>
+                <li>牛淑杰《明清时期衙署建筑制度研究》（2003）</li>
+            </ul>
+            <h3>🗺️ 地图底图来源</h3>
+            <ul>
+                <li>底图来源：国家地理信息公共服务平台“天地图” 标准地图服务 审图号：豫S [2024年] 016号（河南省标准地图政区版）</li>
+                <li>底图下载地址：<a href="https://henan.tianditu.gov.cn/downMap" target="_blank">
+                https://henan.tianditu.gov.cn/downMap</a></li>
+            </ul>
+            <h3>📚 地方志参考</h3>
+            <ul>
+                <li>《开封府志》乾隆版</li>
+                <li>《河南府志》</li>
+                <li>《淮阳县志》</li>
+                <li>《新密市志》</li>
+                <li>《南阳府志》</li>
+            </ul>
+            <h3>🏺 建筑测绘与考古报告</h3>
+            <ul>
+                <li>清华大学出版社《中国古建筑测绘十年》（2009）</li>
+                <li>内乡县衙博物馆《内乡县衙建筑规制实测报告》</li>
+                <li>叶县文物局《叶县县衙修缮与测绘记录》</li>
+            </ul>
+            <p style="margin-top:16px; font-size:12px; color:#6f5a40;">※ 所有数据均来源于公开学术论文、地方志及官方测绘资料，符合大赛数据合规要求。</p>
+        `;
+        return html;
+    }
+
+    function openModal() {
+        const bodyDiv = document.getElementById('referenceBody');
+        if (bodyDiv) bodyDiv.innerHTML = buildReferenceContent();
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeSpan) closeSpan.addEventListener('click', closeModal);
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+
+    // 绑定筛选与对比事件
     document.getElementById('filter-fu').addEventListener('change', applyFilter);
     document.getElementById('filter-xian').addEventListener('change', applyFilter);
+    compareSelectA.addEventListener('change', onCompareChange);
+    compareSelectB.addEventListener('change', onCompareChange);
+    clearCompareBtn.addEventListener('click', clearCompare);
 
-    // 启动
+    // 启动所有
     initMarkers();
     initCharts();
     bindTabs();
-    applyFilter(); // 更新统计信息
+    applyFilter();
+    populateCompareSelects();
 });

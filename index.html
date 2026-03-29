@@ -28,7 +28,10 @@
     </div>
     <div class="right-panel">
         <div class="info-card">
-            <h3>🏛️ 中原官韵 · 明清府衙规制</h3>
+            <h3>
+                🏛️ 中原官韵 · 明清府衙规制
+                <button id="openRefBtn" class="ref-btn">📚 文献引用</button>
+            </h3>
             <p class="sub">河南省衙署分布与建筑规制可视化 | 交互地图+数据图表</p>
             <div class="filter-group">
                 <label><input type="checkbox" id="filter-fu" checked> 府衙</label>
@@ -57,6 +60,25 @@
                 * 点击柱状图中的衙署名称可定位并查看详情 | 数据基于《明清衙署制度研究》、地方志及测绘报告
             </div>
         </div>
+        <!-- 对比模式模块 -->
+        <div class="compare-container">
+            <div class="compare-header">
+                <span>⚖️ 衙署规制对比</span>
+                <button id="clearCompareBtn" class="clear-compare">清空</button>
+            </div>
+            <div class="compare-selectors">
+                <select id="compareSelectA" class="compare-select">
+                    <option value="">选择衙署 A</option>
+                </select>
+                <span class="vs">VS</span>
+                <select id="compareSelectB" class="compare-select">
+                    <option value="">选择衙署 B</option>
+                </select>
+            </div>
+            <div id="compareResult" class="compare-result">
+                <div class="compare-placeholder">请选择两个衙署进行规制对比</div>
+            </div>
+        </div>
         <div class="footer-note">
             📜 规制依据《明会典》《清会典》及南阳、内乡、叶县实测数据
         </div>
@@ -71,5 +93,17 @@
 <script src="js/data.js"></script>
 <script src="js/map.js"></script>
 <script src="js/interaction.js"></script>
+<!-- 文献引用模态框 -->
+<div id="referenceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-modal">&times;</span>
+            <h2>📖 历史文献与数据来源</h2>
+        </div>
+        <div class="modal-body" id="referenceBody">
+            <!-- 动态加载内容 -->
+        </div>
+    </div>
+</div>
 </body>
 </html>
