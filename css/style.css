@@ -577,3 +577,148 @@ body {
     border-radius: 16px;
     margin: 12px 0;
 }
+/* 入场动画 */
+.dashboard {
+    animation: pageFadeIn 0.6s ease-out;
+}
+
+@keyframes pageFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 地图容器独立动画（从左向右） */
+#map-container {
+    animation: slideInLeft 0.5s ease-out 0.1s both;
+}
+
+@keyframes slideInLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 右侧面板独立动画（从右向左） */
+.right-panel {
+    animation: slideInRight 0.5s ease-out 0.2s both;
+}
+
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 可选：地图内部元素（标记等）延迟出现，更平滑 */
+.leaflet-map-pane {
+    animation: fadeInMap 0.3s ease-out 0.3s both;
+}
+@keyframes fadeInMap {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+/* 欢迎入场界面 */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2a2418 0%, #4a3724 100%);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+    font-family: 'Segoe UI', '华文楷书', 'Microsoft YaHei', serif;
+}
+.splash-screen.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+.splash-content {
+    text-align: center;
+    color: #f9efdf;
+    max-width: 700px;
+    padding: 40px 24px;
+    animation: splashFadeInUp 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+@keyframes splashFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.splash-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: iconFloat 2s infinite ease-in-out;
+}
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.splash-title {
+    font-size: 3.2rem;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+    font-weight: 500;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+}
+.splash-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    font-style: italic;
+}
+.splash-decoration {
+    width: 80px;
+    height: 2px;
+    background: #d9b382;
+    margin: 20px auto;
+    border-radius: 2px;
+}
+.enter-button {
+    background: #9b2c1d;
+    border: none;
+    color: #f9efdf;
+    font-size: 1.2rem;
+    padding: 12px 32px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 2px;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    margin-top: 20px;
+}
+.enter-button:hover {
+    background: #c23d2a;
+    transform: scale(1.02);
+}
+.splash-credit {
+    font-size: 0.7rem;
+    margin-top: 40px;
+    opacity: 0.6;
+}

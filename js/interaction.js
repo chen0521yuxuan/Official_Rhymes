@@ -1,6 +1,31 @@
 // 等待DOM和地图加载完成
 document.addEventListener('DOMContentLoaded', () => {
     // 检查 Leaflet 是否可用
+    // ---------- 欢迎入场界面控制 ----------
+    const splashScreen = document.getElementById('splashScreen');
+    const enterBtn = document.getElementById('enterBtn');
+
+    function hideSplashAndStart() {
+        if (splashScreen) {
+            splashScreen.classList.add('hide');
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 800);
+        }
+        setTimeout(() => {
+            if (typeof map !== 'undefined' && map.invalidateSize) {
+                map.invalidateSize();
+            }
+            if (currentChart && currentChart.resize) {
+                currentChart.resize();
+            }
+        }, 200);
+    }
+
+    if (enterBtn) {
+        enterBtn.addEventListener('click', hideSplashAndStart);
+    }
+    // 其余原有代码保持不变...
     if (typeof L === 'undefined') {
         console.error('Leaflet 库未加载，请检查网络或刷新页面重试。');
         document.getElementById('stats-info').innerHTML = '❌ 地图库加载失败，请刷新页面或检查网络。';
