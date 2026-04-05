@@ -722,3 +722,87 @@ body {
     margin-top: 40px;
     opacity: 0.6;
 }
+/* 艺术字标题增强 */
+.splash-title {
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, #f9efdf 0%, #e4c6a7 40%, #c7a07a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    letter-spacing: 8px;
+    font-weight: 700;
+}
+.info-card h3 {
+    font-size: 1.4rem;
+    background: linear-gradient(120deg, #6b2e1a, #9b4a2e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.compare-header span {
+    font-size: 1rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #9b2c1d, #c55a3e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+/* 鼠标互动 */
+button, .tab-btn, .compare-select, .clear-compare, .enter-button, .ref-btn, .legend-item, .stats-badge {
+    transition: all 0.25s ease;
+}
+button:hover, .tab-btn:hover, .enter-button:hover, .ref-btn:hover, .clear-compare:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.enter-button:hover {
+    background: #c23d2a;
+    letter-spacing: 4px;
+}
+.info-card, .chart-container, .compare-container {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.info-card:hover, .chart-container:hover, .compare-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.legend-item:hover {
+    transform: translateX(4px);
+    cursor: pointer;
+}
+.custom-marker div:first-child {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.leaflet-marker-icon:hover .custom-marker div:first-child {
+    transform: rotate(45deg) scale(1.1);
+}
+.compare-select:hover {
+    border-color: #9b2c1d;
+    background: #fff8f0;
+}
+.stats-badge:hover {
+    background: #e0d0ba;
+    transform: scale(1.02);
+}
+body, .dashboard, #map {
+    cursor: default;
+}
+button, .tab-btn, .compare-select, .enter-button, .ref-btn, .clear-compare, .legend-item, .stats-badge, .close-modal, .compare-table th {
+    cursor: pointer;
+}
+.leaflet-container {
+    cursor: crosshair;
+}
+.mouse-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,126,90,0.15) 0%, rgba(201,126,90,0) 70%);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s linear;
+    will-change: transform;
+}

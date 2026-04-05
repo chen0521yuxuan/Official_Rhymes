@@ -306,41 +306,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const uniqueSources = Array.from(sourcesSet);
         let html = `
-            <h3>🏛️ 衙署测绘与文献数据</h3>
-            <div class="source-list">
-                <ul>
-                    ${uniqueSources.map(src => `<li><strong>${src}</strong></li>`).join('')}
-                </ul>
-            </div>
-            <h3>📜 明清官署规制依据</h3>
+        <h3>🏛️ 衙署测绘与文献数据</h3>
+        <div class="source-list">
             <ul>
-                <li>《明会典》卷一八一·工部·营缮清吏司·公廨</li>
-                <li>《清会典》卷五十八·工部·营缮清吏司·衙署规制</li>
-                <li>刘敦桢《中国古代建筑史》·官署建筑章节</li>
-                <li>牛淑杰《明清时期衙署建筑制度研究》（2003）</li>
+                ${uniqueSources.map(src => `<li><strong>${src}</strong></li>`).join('')}
             </ul>
-            <h3>🗺️ 地图底图来源</h3>
-            <ul>
-                <li>底图来源：国家地理信息公共服务平台“天地图” 标准地图服务 审图号：豫S [2024年] 016号（河南省标准地图政区版）</li>
-                <li>底图下载地址：<a href="https://henan.tianditu.gov.cn/downMap" target="_blank">
-                https://henan.tianditu.gov.cn/downMap</a></li>
-            </ul>
-            <h3>📚 地方志参考</h3>
-            <ul>
-                <li>《开封府志》乾隆版</li>
-                <li>《河南府志》</li>
-                <li>《淮阳县志》</li>
-                <li>《新密市志》</li>
-                <li>《南阳府志》</li>
-            </ul>
-            <h3>🏺 建筑测绘与考古报告</h3>
-            <ul>
-                <li>清华大学出版社《中国古建筑测绘十年》（2009）</li>
-                <li>内乡县衙博物馆《内乡县衙建筑规制实测报告》</li>
-                <li>叶县文物局《叶县县衙修缮与测绘记录》</li>
-            </ul>
-            <p style="margin-top:16px; font-size:12px; color:#6f5a40;">※ 所有数据均来源于公开学术论文、地方志及官方测绘资料，符合大赛数据合规要求。</p>
-        `;
+        </div>
+        <h3>📜 明清官署规制依据</h3>
+        <ul>
+            <li>《明会典》卷一八一·工部·营缮清吏司·公廨</li>
+            <li>《清会典》卷五十八·工部·营缮清吏司·衙署规制</li>
+            <li>刘敦桢《中国古代建筑史》·官署建筑章节</li>
+            <li>牛淑杰《明清时期衙署建筑制度研究》（2003）</li>
+        </ul>
+        <h3>📄 近期学术研究（南北文化交融专题）</h3>
+        <div class="source-list">
+            <p><strong>论文题目：</strong>衙署建筑形制与艺术特征研究</p>
+            <p><strong>作者：</strong>于小桐，周小琳，赵武</p>
+            <p><strong>来源：</strong>建筑技术开发，2024年，第51卷第8期，第1-3页</p>
+            <p><strong>摘要：</strong>以南阳府衙和内乡县衙为例，分析南北文化交融地带古建筑的艺术特征，涵盖空间布局、造型风格、建筑构造等方面。指出两座衙署既具北方农耕文明的粗犷大气，又兼南方水流潺潺的温柔细腻，体现了“明三暗五”“廊道回廊”“月梁”“风火墙”“过风脊”等南北融合手法。</p>
+            <p><strong>关键词：</strong>建筑形制；南北文化；衙署建筑；建筑艺术</p>
+            <p><strong>DOI/链接：</strong>（期刊官网可查）</p>
+        </div>
+        <h3>🗺️ 地图底图来源</h3>
+        <ul>
+            <li>中华人民共和国自然资源部 标准地图服务，审图号：GS（2023）1267号（河南省地图基础要素版）</li>
+            <li>底图下载地址：<a href="http://bzdt.ch.mnr.gov.cn/" target="_blank">http://bzdt.ch.mnr.gov.cn/</a></li>
+        </ul>
+        <h3>📚 地方志参考</h3>
+        <ul>
+            <li>《开封府志》乾隆版</li>
+            <li>《河南府志》</li>
+            <li>《淮阳县志》</li>
+            <li>《新密市志》</li>
+            <li>《南阳府志》</li>
+        </ul>
+        <h3>🏺 建筑测绘与考古报告</h3>
+        <ul>
+            <li>清华大学出版社《中国古建筑测绘十年》（2009）</li>
+            <li>内乡县衙博物馆《内乡县衙建筑规制实测报告》</li>
+            <li>叶县文物局《叶县县衙修缮与测绘记录》</li>
+        </ul>
+        <p style="margin-top:16px; font-size:12px; color:#6f5a40;">※ 所有数据均来源于公开学术论文、地方志及官方测绘资料，符合大赛数据合规要求。</p>
+    `;
         return html;
     }
 
@@ -373,4 +381,18 @@ document.addEventListener('DOMContentLoaded', () => {
     bindTabs();
     applyFilter();
     populateCompareSelects();
+    // ---------- 鼠标跟随光晕特效 ----------
+    const glowDiv = document.createElement('div');
+    glowDiv.className = 'mouse-glow';
+    document.body.appendChild(glowDiv);
+
+    document.addEventListener('mousemove', (e) => {
+        glowDiv.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    });
+    document.addEventListener('mouseleave', () => {
+        glowDiv.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+        glowDiv.style.opacity = '1';
+    });
 });
