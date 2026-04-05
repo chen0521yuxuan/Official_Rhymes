@@ -806,3 +806,127 @@ button, .tab-btn, .compare-select, .enter-button, .ref-btn, .clear-compare, .leg
     transition: transform 0.05s linear;
     will-change: transform;
 }
+/* ========== 粒子画布 ========== */
+.particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+.splash-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* ========== 水墨边框 ========== */
+.ink-border {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    pointer-events: none;
+    z-index: 9999;
+    border: 2px solid rgba(80, 50, 30, 0.3);
+    border-radius: 32px;
+    box-shadow: 0 0 0 1px rgba(200, 170, 120, 0.4), inset 0 0 20px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+/* 模拟水墨晕染效果 */
+.ink-border::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(100,70,40,0.2) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+}
+.ink-border::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(100,70,40,0.2) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+}
+
+/* 红色印章 */
+.chop-seal {
+    position: fixed;
+    top: 30px;
+    right: 40px;
+    font-family: "华文楷书", "KaiTi", serif;
+    font-size: 2rem;
+    color: #b53b2a;
+    opacity: 0.7;
+    transform: rotate(12deg);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    z-index: 10000;
+    pointer-events: none;
+    background: rgba(255,240,210,0.3);
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid #b53b2a;
+    letter-spacing: 2px;
+}
+
+/* 地图切换按钮组 */
+.map-switch-group {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    padding: 6px 12px;
+    border-radius: 40px;
+}
+.map-switch-btn {
+    background: #2c2418;
+    border: none;
+    color: #e9dfcf;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.map-switch-btn.active {
+    background: #9b2c1d;
+    color: white;
+    box-shadow: 0 0 6px rgba(155,44,29,0.5);
+}
+.map-switch-btn:hover {
+    background: #5e3a2b;
+}
+
+/* 音乐控制按钮 */
+.music-control {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    border: none;
+    color: #f0e5d2;
+    padding: 8px 14px;
+    border-radius: 40px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: monospace;
+}
+.music-control:hover {
+    background: #9b2c1d;
+    transform: scale(1.02);
+}

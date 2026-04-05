@@ -37,3 +37,4 @@
     // 比例尺
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
 })();
+window.imageOverlay = imageOverlay;

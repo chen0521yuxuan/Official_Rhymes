@@ -395,4 +395,163 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseenter', () => {
         glowDiv.style.opacity = '1';
     });
+    // ---------- 粒子背景 (欢迎界面) ----------
+    const canvas = document.getElementById('particleCanvas');
+    let ctx, particles = [], animationId;
+    function initParticles() {
+        if (!canvas) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx = canvas.getContext('2d');
+        const particleCount = 80;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 12 + 6,
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.3 + 0.2,
+                shape: ['🏛️', '🏯', '🪨', '📜', '⚙️'][Math.floor(Math.random() * 5)],
+                alpha: Math.random() * 0.5 + 0.2
+            });
+        }
+        function draw() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.font = `${p.size}px "Segoe UI Emoji"`;
+                ctx.globalAlpha = p.alpha;
+                ctx.fillText(p.shape, p.x, p.y);
+                p.x += p.speedX;
+                p.y += p.speedY;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.y > canvas.height) p.y = 0;
+                if (p.y < 0) p.y = canvas.height;
+            });
+            animationId = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+    window.addEventListener('resize', () => {
+        if (canvas && canvas.parentElement && getComputedStyle(canvas.parentElement).display !== 'none') {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    });
+    // 只在欢迎界面显示粒子，进入主界面后停止动画
+    function stopParticles() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        if (canvas) canvas.style.display = 'none';
+    }
+    initParticles();
+
+    // 修改 hideSplashAndStart 函数，停止粒子动画
+    const originalHide = hideSplashAndStart;
+    window.hideSplashAndStart = function() {
+        stopParticles();
+        if (originalHide) originalHide();
+    };
+    // 重新绑定 enterBtn 事件
+    if (enterBtn) {
+        enterBtn.removeEventListener('click', hideSplashAndStart);
+        enterBtn.addEventListener('click', () => {
+            stopParticles();
+            hideSplashAndStart();
+        });
+    }
+
+    // ---------- 地图底图切换 ----------
+    let currentBaseLayer = null;
+    // 标准地图（原来的图片覆盖层）
+    const stdOverlay = imageOverlay; // 来自 map.js
+    // 复古风格 tileLayer
+    const retroLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & CartoDB',
+        maxZoom: 12
+    });
+    // 卫星图
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 12
+    });
+
+    function switchToStandard() {
+        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
+        map.addLayer(stdOverlay);
+        currentBaseLayer = stdOverlay;
+        // 确保标准地图在最底层
+        stdOverlay.bringToBack();
+    }
+    function switchToRetro() {
+        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
+        map.addLayer(retroLayer);
+        currentBaseLayer = retroLayer;
+    }
+    function switchToSatellite() {
+        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
+        map.addLayer(satelliteLayer);
+        currentBaseLayer = satelliteLayer;
+    }
+    // 绑定按钮事件
+    document.getElementById('mapStdBtn').addEventListener('click', () => {
+        switchToStandard();
+        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('mapStdBtn').classList.add('active');
+    });
+    document.getElementById('mapRetroBtn').addEventListener('click', () => {
+        switchToRetro();
+        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('mapRetroBtn').classList.add('active');
+    });
+    document.getElementById('MapSatBtn').addEventListener('click', () => {
+        switchToSatellite();
+        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('MapSatBtn').classList.add('active');
+    });
+    // 默认标准地图（已存在），但需记录 currentBaseLayer
+    currentBaseLayer = stdOverlay;
+
+    // ---------- 背景音乐 ----------
+    const musicBtn = document.getElementById('musicBtn');
+    let audio = null;
+    let isPlaying = false;
+
+    function initAudio() {
+        audio = new Audio('assets/background-music.mp3');
+        audio.loop = true;
+        audio.volume = 0.3;
+        audio.preload = 'auto';
+        audio.addEventListener('error', () => {
+            console.error('音乐加载失败，请检查 assets/background-music.mp3 是否存在');
+            if (musicBtn) {
+                musicBtn.textContent = '🎵 音乐不可用';
+                musicBtn.disabled = true;
+            }
+        });
+    }
+
+    function toggleMusic() {
+        if (!audio) initAudio();
+        if (isPlaying) {
+            audio.pause();
+            musicBtn.textContent = '🎵 奏·古韵';
+        } else {
+            audio.play().catch(e => {
+                console.warn('播放失败:', e);
+                musicBtn.textContent = '🎵 点击重试';
+            });
+            musicBtn.textContent = '🔊 古韵悠扬';
+        }
+        isPlaying = !isPlaying;
+    }
+
+// 绑定按钮事件
+    if (musicBtn) {
+        musicBtn.addEventListener('click', toggleMusic);
+        initAudio(); // 预加载但不自动播放
+    }
 });
