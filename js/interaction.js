@@ -464,57 +464,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ---------- 地图底图切换 ----------
-    let currentBaseLayer = null;
-    // 标准地图（原来的图片覆盖层）
-    const stdOverlay = imageOverlay; // 来自 map.js
-    // 复古风格 tileLayer
-    const retroLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & CartoDB',
-        maxZoom: 12
-    });
-    // 卫星图
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 12
-    });
+    // ---------- 地图底图切换（使用本地三张标准地图图片）----------
+    const mapLayers = {
+        standard: {
+            name: '标准地图',
+            url: 'assets/map-bg.jpg',
+            btnId: 'mapStdBtn',
+            credit: '豫S [2024年] 016号'
+        },
+        element: {
+            name: '基础要素版',
+            url: 'assets/map-bg-element.jpg',
+            btnId: 'mapElementBtn',
+            credit: '同标准地图服务'
+        },
+        base: {
+            name: '地势版',
+            url: 'assets/map-bg-base.jpg',
+            btnId: 'mapBaseBtn',
+            credit: '同标准地图服务'
+        }
+    };
 
-    function switchToStandard() {
-        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
-        map.addLayer(stdOverlay);
-        currentBaseLayer = stdOverlay;
-        // 确保标准地图在最底层
-        stdOverlay.bringToBack();
-    }
-    function switchToRetro() {
-        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
-        map.addLayer(retroLayer);
-        currentBaseLayer = retroLayer;
-    }
-    function switchToSatellite() {
-        if (currentBaseLayer) map.removeLayer(currentBaseLayer);
-        map.addLayer(satelliteLayer);
-        currentBaseLayer = satelliteLayer;
-    }
-    // 绑定按钮事件
-    document.getElementById('mapStdBtn').addEventListener('click', () => {
-        switchToStandard();
-        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mapStdBtn').classList.add('active');
-    });
-    document.getElementById('mapRetroBtn').addEventListener('click', () => {
-        switchToRetro();
-        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mapRetroBtn').classList.add('active');
-    });
-    document.getElementById('MapSatBtn').addEventListener('click', () => {
-        switchToSatellite();
-        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('MapSatBtn').classList.add('active');
-    });
-    // 默认标准地图（已存在），但需记录 currentBaseLayer
-    currentBaseLayer = stdOverlay;
+    let currentOverlay = null;
+    const bounds = window.mapBounds;  // 从 map.js 获取
 
+    function switchMapLayer(type) {
+        if (!bounds) {
+            console.error('地图边界未定义');
+            return;
+        }
+        const config = mapLayers[type];
+        if (!config) return;
+
+        if (currentOverlay) {
+            map.removeLayer(currentOverlay);
+        }
+        const newOverlay = L.imageOverlay(config.url, bounds, {
+            opacity: 0.92,
+            attribution: `底图来源：河南省地理信息公共服务平台 审图号：${config.credit}`
+        }).addTo(map);
+        currentOverlay = newOverlay;
+
+        // 更新按钮样式
+        document.querySelectorAll('.map-switch-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(config.btnId).classList.add('active');
+    }
+
+// 绑定事件
+    document.getElementById('mapStdBtn').addEventListener('click', () => switchMapLayer('standard'));
+    document.getElementById('mapElementBtn').addEventListener('click', () => switchMapLayer('element'));
+    document.getElementById('mapBaseBtn').addEventListener('click', () => switchMapLayer('base'));
+
+// 如果 map.js 中已经添加了标准地图，先移除，由本模块统一控制
+    if (window.stdOverlay) {
+        map.removeLayer(window.stdOverlay);
+    }
+    switchMapLayer('standard');
     // ---------- 背景音乐 ----------
     const musicBtn = document.getElementById('musicBtn');
     let audio = null;

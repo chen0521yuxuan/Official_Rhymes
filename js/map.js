@@ -21,8 +21,16 @@
     const standardMapImage = "assets/map-bg.jpg";
     const imageOverlay = L.imageOverlay(standardMapImage, bounds, {
         opacity: 0.92,
-        attribution: '底图审图号：GS（2023）1267号'
+        attribution: '审图号：豫S [2024年] 016号（政区版）'
     }).addTo(map);
+    const elementOverlay = L.imageOverlay('assets/map-bg-element.jpg', bounds, {
+        opacity: 0.92,
+        attribution: '审图号：豫S [2024年] 016号（基础要素版）'
+    });
+    const baseOverlay = L.imageOverlay('assets/map-bg-base.jpg', bounds, {
+        opacity: 0.92,
+        attribution: '审图号：豫S [2024年] 016号（地势版）'
+    });
 
     // 底图加载失败提示
     imageOverlay.on('loaderror', () => {
@@ -36,5 +44,7 @@
 
     // 比例尺
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
+
+    window.stdOverlay = imageOverlay;
+    window.mapBounds = bounds;
 })();
-window.imageOverlay = imageOverlay;
